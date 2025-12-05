@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TurkuazCore • v13 Web</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #eef7f9;
+    }
+
+    header {
+        background: #0ab5d5;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    #chat-box {
+        height: 68vh;
+        overflow-y: auto;
+        padding: 15px;
+    }
+
+    .ai-msg {
+        background: #d3f5ff;
+        color: #004a57;
+        padding: 10px 14px;
+        border-radius: 10px;
+        margin: 8px 0;
+        width: fit-content;
+        max-width: 80%;
+    }
+
+    .user-msg {
+        background: white;
+        color: black;
+        padding: 10px 14px;
+        border-radius: 10px;
+        margin: 8px 0;
+        width: fit-content;
+        max-width: 80%;
+        margin-left: auto;
+    }
+
+    #bottom-bar {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background: white;
+        padding: 10px;
+        display: flex;
+        gap: 8px;
+        border-top: 1px solid #ccc;
+    }
+
+    #textInput {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #bbb;
+        border-radius: 8px;
+    }
+
+    #sendBtn, #uploadBtn {
+        padding: 10px 14px;
+        border: none;
+        border-radius: 8px;
+        background: #0ab5d5;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+
+</head>
+<body>
+
+<header>TurkuazCore • v13 Web</header>
+
+<div id="chat-box"></div>
+
+<div id="bottom-bar">
+    <input type="file" id="uploadBtn" accept="image/*">
+    <input type="text" id="textInput" placeholder="Bir mesaj yaz...">
+    <button id="sendBtn">Gönder</button>
+</div>
+
+<script>
+    const chatBox = document.getElementById("chat-box");
+    const textInput = document.getElementById("textInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function addMessage(text, sender) {
+        const msg = document.createElement("div");
+        msg.className = sender === "user" ? "user-msg" : "ai-msg";
+        msg.innerText = text;
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    sendBtn.onclick = () => {
+        if (textInput.value.trim() === "") return;
+        addMessage(textInput.value, "user");
+
+        // Şimdilik AI cevabı simülasyon — yarın gerçek bağlantı eklenecek
+        setTimeout(() => {
+            addMessage("📌 Mesaj alındı. Yarın Gemini + 17 Kriter motoru bağlanacak!", "ai");
+        }, 700);
+
+        textInput.value = "";
+    };
+</script>
+
+</body>
+</html>
