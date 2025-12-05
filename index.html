@@ -1,190 +1,146 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TurkuazCore • v13 Web</title>
-  <style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TurkuazCore • v13 Web</title>
+
+<style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #eaf3f7;
+        background: #e9f4f7;
+        margin: 0;
+        font-family: Arial, sans-serif;
     }
 
-    /* Şifre ekranı */
-    #auth-screen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: #eaf3f7;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+    h1 {
+        padding: 20px;
+        color: #004d61;
+        font-size: 24px;
+        text-align: center;
     }
-
-    #auth-box {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      width: 85%;
-      max-width: 350px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-
-    #auth-box input {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    #auth-box button {
-      margin-top: 12px;
-      width: 100%;
-      padding: 12px;
-      background: #009688;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    /* Chat UI */
-    #chat-app { display: none; padding: 20px; }
-    h1 { color: #000; font-size: 26px; }
 
     #chat-box {
-      background:white;
-      width: 100%;
-      height: 65vh;
-      border-radius: 12px;
-      padding: 12px;
-      overflow-y: auto;
-      margin-bottom: 15px;
+        width: 90%;
+        max-width: 800px;
+        margin: 0 auto;
+        height: 75vh;
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
     .msg {
-      padding: 10px 14px;
-      border-radius: 10px;
-      max-width: 80%;
-      margin-bottom: 10px;
-      width: fit-content;
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        margin: 8px 0;
+        white-space: pre-wrap;
+        line-height: 1.4;
     }
 
     .user {
-      background: #d1efff;
-      margin-left: auto;
+        background: #d1eef7;
+        align-self: flex-end;
     }
 
-    .ai {
-      background: #c8f7e6;
-      margin-right: auto;
+    .bot {
+        background: #baf2d8;
+        align-self: flex-start;
     }
 
     #input-area {
-      display: flex;
-      gap: 10px;
+        width: 90%;
+        max-width: 800px;
+        margin: 10px auto;
+        display: flex;
+        gap: 10px;
     }
 
-    #textInput {
-      flex-grow: 1;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #999;
+    #messageInput {
+        flex: 1;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #aaa;
+        font-size: 16px;
     }
 
     #sendBtn {
-      background: #009688;
-      color: white;
-      padding: 12px 18px;
-      border-radius: 10px;
-      border: none;
-      font-weight: bold;
+        background: #009688;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
     }
-  </style>
+
+    #sendBtn:hover {
+        background: #00796b;
+    }
+</style>
 </head>
 
 <body>
 
-<!-- 🔐 ŞİFRE EKRANI -->
-<div id="auth-screen">
-  <div id="auth-box">
-    <h2>Giriş Yap</h2>
-    <p>Şifreyi girin</p>
-    <input type="password" id="passwordInput" placeholder="Şifre">
-    <button onclick="checkPassword()">Giriş</button>
-    <p id="auth-error" style="color:red; display:none; margin-top:10px;">
-      ❌ Hatalı şifre!
-    </p>
-  </div>
-</div>
+<h1>TurkuazCore • v13 Web</h1>
 
-<!-- 💬 CHAT UYGULAMASI -->
-<div id="chat-app">
-  <h1>TurkuazCore • v13 Web</h1>
+<div id="chat-box"></div>
 
-  <div id="chat-box"></div>
-
-  <div id="input-area">
-    <input id="textInput" type="text" placeholder="Mesaj yaz...">
+<div id="input-area">
+    <input id="messageInput" type="text" placeholder="Maçı yaz... (örn: Fenerbahçe - Galatasaray)">
     <button id="sendBtn">Gönder</button>
-  </div>
 </div>
 
 <script>
-/* =======================
-     🔐 ŞİFRE DOĞRULAMA
-   =======================*/
+const API_URL = "https://predictmatch-436680999898.us-central1.run.app";
 
-// Şifreyi kod içinde AES benzeri basit obfuscation ile saklıyoruz
-const encodedPassword = "dGxnYTE5NzA="; // Base64 → "tlga1970"
-
-function checkPassword() {
-  const input = document.getElementById("passwordInput").value;
-  const decoded = atob(encodedPassword);
-
-  if (input === decoded) {
-    document.getElementById("auth-screen").style.display = "none";
-    document.getElementById("chat-app").style.display = "block";
-  } else {
-    document.getElementById("auth-error").style.display = "block";
-  }
-}
-
-/* =======================
-       💬 CHAT ÇEKİRDEĞİ
-   =======================*/
+const chatBox = document.getElementById("chat-box");
+const input = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
 
 function addMessage(text, sender) {
-  const chatBox = document.getElementById("chat-box");
-
-  const msg = document.createElement("div");
-  msg.classList.add("msg");
-  msg.classList.add(sender);
-  msg.innerText = text;
-
-  chatBox.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
+    const div = document.createElement("div");
+    div.className = "msg " + sender;
+    div.innerText = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Gönder butonu
-document.getElementById("sendBtn").onclick = () => {
-  const input = document.getElementById("textInput");
+async function getPrediction(matchName) {
+    const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ matchName })
+    });
 
-  if (input.value.trim() === "") return;
+    const data = await response.json();
+    return data.result || "⚠ Tahmin alınamadı.";
+}
 
-  addMessage(input.value, "user");
+async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
 
-  setTimeout(() => {
-    addMessage("📌 Mesaj alındı. Gemini bağlantısı ekleniyor...", "ai");
-  }, 600);
+    addMessage(text, "user");
+    input.value = "";
 
-  input.value = "";
-};
+    addMessage("🔄 Tahmin alınıyor...", "bot");
+
+    const result = await getPrediction(text);
+
+    // Son bot mesajını güncelle
+    const botMsgs = document.getElementsByClassName("bot");
+    botMsgs[botMsgs.length - 1].innerText = result;
+}
+
+sendBtn.onclick = sendMessage;
+input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+});
 </script>
 
 </body>
